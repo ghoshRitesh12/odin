@@ -24,6 +24,10 @@
     --input: 220 13% 91%;
     --ring: 262.1 83.3% 57.8%;
     --radius: 0.75rem;
+
+    --scroll-track: var(--background);
+    --scroll-thumb: 0 0% 38%;
+    --scroll-thumb-hover: 0 0% 45%;
   }
 
   .dark {
@@ -46,6 +50,10 @@
     --border: 215 27.9% 16.9%;
     --input: 215 27.9% 16.9%;
     --ring: 263.4 70% 50.4%;
+
+    --scroll-track: var(--background);
+    --scroll-thumb: var(--muted-foreground);
+    --scroll-thumb-hover: var(--muted-foreground);
   }
 }
 
@@ -110,4 +118,30 @@ h5,
 h6,
 textarea {
   overflow-wrap: break-word;
+}
+
+*::-webkit-scrollbar {
+  width: 1rem;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--scroll-thumb));
+  border-radius: 1rem;
+  border: 0.3rem solid hsl(var(--background));
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--scroll-thumb-hover));
+}
+
+*::-webkit-scrollbar-track {
+  background-color: hsl(var(--scroll-track));
+}
+
+* {
+  scrollbar-color: hsl(var(--scroll-thumb)) hsl(var(--scroll-track));
+  scrollbar-width: thin;
+  transition: 0.1s ease padding, 0.1s ease margin, 0.1s ease width,
+    0.1s ease height, 0.1s ease gap, 0.1s ease max-width, 0.1s ease max-height,
+    0.1s ease min-width, 0.1s ease min-height;
 }
