@@ -1,0 +1,25 @@
+"use client";
+
+import { useEffect } from "react";
+import { useToast } from "./ui/useToast";
+import { Odin } from "@/lib/OdinDB";
+
+export default function UserIdSetter() {
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (crypto?.randomUUID) {
+      Odin.initUser(crypto.randomUUID()).catch((e) => {
+        console.error(e); // TODO: remove this line
+
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to setup user identification",
+        });
+      });
+    }
+  }, []);
+
+  return <></>;
+}

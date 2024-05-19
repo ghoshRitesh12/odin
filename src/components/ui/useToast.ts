@@ -188,4 +188,6 @@ function useToast() {
   };
 }
 
-export { useToast, toast };
+type ToastFn = typeof toast;
+
+export { useToast, toast, type ToastFn };

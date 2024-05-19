@@ -21,14 +21,15 @@ export default function Titlebar() {
       >
         <AppLogo iconColorStyle={titlebarItemColor} />
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <ThemeToggler iconColorStyle={titlebarItemColor} />
 
           <Button
             asChild
-            variant={"outline"}
+            variant="outline"
             className="w-10"
-            size={"icon"}
+            size="icon"
+            title="GitHub"
           >
             <Link
               target="_blank"
@@ -36,8 +37,8 @@ export default function Titlebar() {
               className={titlebarItemColor}
             >
               <GitHubLogoIcon
-                width={24}
-                height={24}
+                width={22}
+                height={22}
                 color="currentColor"
               />
             </Link>

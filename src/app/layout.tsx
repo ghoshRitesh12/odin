@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Source_Sans_3 as SourceSans } from "next/font/google";
 
 import Titlebar from "@/components/Titlebar";
+import UserIdSetter from "@/components/UserIdSetter";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
@@ -38,18 +39,23 @@ export default function RootLayout({ children }: RootLayoutProps) {
           enableSystem
           disableTransitionOnChange
         >
-          <Titlebar />
+          <section className="flex flex-col min-h-[100vh]">
+            <Titlebar />
 
-          <main
-            className={cn`
-              pt-4 sm:pt-8 pb-8 mx-auto w-full max-w-[92%] 
-              md:max-w-[95%] xl:max-w-[85%] 2xl:max-w-[70%]
-            `}
-          >
-            {children}
-          </main>
+            <main
+              className={cn`
+                flex flex-col border-[0px] py-4 h-full
+                mx-auto max-w-[92%] w-full md:max-w-[95%]
+                xl:max-w-[85%] 2xl:max-w-[70%] flex-1
+              `}
+            >
+              {children}
+            </main>
+          </section>
 
           <Toaster />
+
+          <UserIdSetter />
         </ThemeProvider>
       </body>
     </html>

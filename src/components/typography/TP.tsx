@@ -7,13 +7,5 @@ type TypographyPProps = PropsWithChildren<{
 
 export function TypographyP({ children, className }: TypographyPProps) {
   // [&:not(:first-child)]:mt-6
-  return (
-    <p
-      className={cn`
-        leading-7 ${className}
-      `}
-    >
-      {children}
-    </p>
-  );
+  return <p className={cn`leading-7 ${className}`}>{children}</p>;
 }

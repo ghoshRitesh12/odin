@@ -1,0 +1,199 @@
+for nearly the past year I&amp;#39;ve been
+working on a startup where we&amp;#39;re
+deploying coding assistants that learn
+together with the user we&amp;#39;re actually
+continually training these models in
+production so they can adapt to any new
+problem that may arise for example if a
+user starts working with a new library
+that the model&amp;#39;s never been trained on
+or perhaps they&amp;#39;re trying to implement
+some Niche research paper that the
+model&amp;#39;s never seen before existing tools
+like ithub co-pilot tend to really fall
+flat so to solve this we&amp;#39;re continually
+training these models on these new
+topics in real time as they come up but
+whenever we pitch this idea we always
+get the exact same question which is why
+don&amp;#39;t you just gather the relevant data
+pass it into your model&amp;#39;s context and
+solve this problem with in context
+learning before I give you my response
+I&amp;#39;ll briefly explain what in context
+learning is it&amp;#39;s basically just what it
+sounds like before you prompt a model
+with some task the idea is that you
+first give it relevant context so in the
+case of programming this could be
+something like documentation for a
+library that you&amp;#39;re using you would pass
+the documentation into the model and
+then because these models are trained
+with a long context window and with this
+contextual information along with
+relevant tasks they tend to learn to
+extract information from that given
+context which they can then use to solve
+the main task at hand and this is a
+notable thing because it means that you
+could do something like pass the model
+documentation for a new library that
+it&amp;#39;s never seen before and it could
+potentially still work without any
+additional training or back propagation
+this whole approach of retrieving
+relevant context and then using it to
+generate something useful is popularly
+known as retrieval augmented generation
+or rag for short and we really do get
+this question pretty much every time we
+give a technical pitch it&amp;#39;s always why
+don&amp;#39;t you use Rag and this is honestly a
+very reasonable thing to ask given the
+recent history of llms just a few years
+ago the maximum context length you could
+get was something like 2 to 4,000 tokens
+now you can get 10 million tokens at a
+fraction of the cost with significantly
+better accuracy that is crazy and if we
+consider the fact that Lins are probably
+going to keep getting better it makes a
+lot of sense to try and solve these
+problems with things that rely on this
+long context length like Rag and in
+context learning and it&amp;#39;s not to mention
+that our approach of continually
+training models is considerably slower
+and more expensive so obviously this
+raises the question why would anyone
+ever go with our approach of training
+models in production if you want a
+little challenge actually pause the
+video take a second and really think
+about this heck leave a comment if you
+think you know where I&amp;#39;m going with this
+also you might as well subscribe while
+you&amp;#39;re at it okay so hopefully you&amp;#39;ve
+taken a second to think about it if you
+want uh so why do I say that in context
+learning and rag are not enough in the
+title of this video or probably
+something like in context learning isn&amp;#39;t
+enough well there are two critical
+shortcomings of a rag approach when it
+comes to doing what we&amp;#39;re doing
+the first is that you won&amp;#39;t necessarily
+always be able to find the context you
+need and sometimes the right context
+won&amp;#39;t even exist if for example you&amp;#39;ve
+ever worked with new Niche libraries or
+God forbid internal tooling at any
+software company you&amp;#39;ll know what I&amp;#39;m
+talking about sometimes the
+documentation just doesn&amp;#39;t exist which
+you know it sucks uh and in this case
+maybe you could try something like
+retrieving relevant code Snippets and
+using that instead and maybe maybe just
+maybe that would kind of work but the
+point is is that as the problems you
+solving approach the boundary of what
+humans have solved before which is
+basically what research is you&amp;#39;ll
+eventually get to the point where there
+are no references that tell you how to
+do what you want to do and rag can be a
+great tool for many problems but it
+alone does not enable models to solve
+these sorts of Niche or very hard
+problems that we want our models to be
+able to solve because in these cases the
+information we often need just doesn&amp;#39;t
+exist in the first place so that&amp;#39;s the
+first reason we&amp;#39;re not doing Rag and the
+second critical shortcoming of in
+context learning specifically is that
+the scope of what a model can learn in
+context is limited by the model&amp;#39;s
+pre-training data let me explain what I
+mean by this with an example to
+clarify if we were to train an llm on
+primarily code and documentation we
+would expect it to know about things
+like loops and conditionals and we would
+expect it to be good at programming but
+you know not so good at something like
+writing poetry because well it wasn&amp;#39;t
+trained on poetry in the same way that
+understanding loops and conditionals are
+skills that a model can learn and
+context learning is just another skill
+that a model can learn though rather
+than one skill it&amp;#39;s more like a group of
+skills that includes things like
+learning via example learning to use
+documentation learning to infer via
+induction and so on and depending on the
+exact topics model and learning
+algorithm these in context learning
+skills may also be tied to a specific
+domain for for example a model trained
+on code may be great at using examples
+of existing highquality code Snippets to
+generate new samples of high quality
+code because it understands what makes
+the examples high quality but if given
+examples of high quality poetry it may
+fail to generate new high quality poetry
+because it doesn&amp;#39;t necessarily
+understand what makes the initial
+examples high quality I&amp;#39;m giving this
+example to illustrate the point that in
+context learning actually consists of
+many different skills that are not
+always independent of the topic of the
+context so in this prior example that&amp;#39;s
+to say the ability to learn via example
+was tied to the subject matter so now
+getting back to my point if you want to
+use a large Foundation model to solve
+some generic task this point is of no
+consequence to you models like Chachi PT
+and Claude are intentionally trained on
+a massive variety of data so that they
+will work on a massive variety of
+generic problems however if you want a
+model to solve the most interesting
+problems invent genuinely new Solutions
+and surpass the limits of human
+knowledge and ability then a model with
+frozen weights won&amp;#39;t get you there even
+if it can learn in context the types of
+patterns it can recognize and the types
+of things it can learn in context will
+be limited by its pre-training data this
+is why continual learning is important
+and it&amp;#39;s why we&amp;#39;re training models even
+in production at my startup even if it
+is expensive it&amp;#39;s because without
+continual learning you are limiting the
+potential of what your model can learn
+note that I&amp;#39;m not saying we shouldn&amp;#39;t
+use in context learning in context
+learning is in fact a very powerful tool
+rather I&amp;#39;m saying in context learning
+alone is not enough to solve the types
+of problems that I want to solve this is
+a problem I care a lot about and I&amp;#39;m
+currently working on a research project
+related to this in my spare time but
+it&amp;#39;s not something I have time to do
+alone if you have programming skills
+some familiarity with ml in the subject
+matter and would be interested in
+collaborating uh do reach out to me via
+the email link on my Channel but that&amp;#39;s
+all for now subscribe if you want to see
+more of this and thank you so much for
+watching
