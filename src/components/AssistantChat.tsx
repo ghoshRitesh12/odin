@@ -8,7 +8,7 @@ export default function AssistantChat({ children }: AssistantChatProps) {
     <div
       className={cn`
         w-fit px-4 py-2 rounded-2xl mr-auto leading-6
-        max-w-[36ch] sm:max-w-[70ch] bg-secondary
+        max-w-[36ch] sm:max-w-[55ch] lg:max-w-[70ch] bg-secondary
         text-zinc-700 dark:text-zinc-200 my-4
       `}
     >
