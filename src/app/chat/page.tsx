@@ -3,32 +3,19 @@
 import ReactMarkdown from "react-markdown";
 import UserChat from "@/components/UserChat";
 import AssistantChat from "@/components/AssistantChat";
-// import ChatFrame from "@/components/ChatFrame";
-// import PromptInput from "@/components/PromptInput";
 import { Spinner } from "@/components/icon/Spinner";
 import { SendIcon } from "@/components/icon/SendIcon";
 import { Button } from "@/components/ui/button";
-// import { Textarea } from "@/components/ui/textarea";
-import { cn, initialMessages } from "@/lib/utils";
+import { cn, initialMessages, scrollToEnd } from "@/lib/utils";
 import { useChat } from "ai/react";
-import { useEffect, useState, type Key } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Odin, type MessageData, type MessageMetaData } from "@/lib/OdinDB";
-import type { Message } from "ai";
-
-export const convoMap = {
-  assistant: (key: Key) => <AssistantChat key={key} />,
-  user: (key: Key, message: string) => (
-    <UserChat
-      message={message}
-      key={key}
-    />
-  ),
-};
+import { useToast } from "@/components/ui/useToast";
 
 export default function ChatPage() {
+  const { toast } = useToast();
   const [userKey, setUserKey] = useState<string | null>(null);
-  const [storedMessages, setStoredMessages] = useState<Message[]>([]);
 
   const {
     input,
@@ -37,20 +24,18 @@ export default function ChatPage() {
     setMessages,
     handleSubmit,
     handleInputChange,
-    data,
   } = useChat({
     initialMessages,
     api: "/api/chat",
     body: {
       userId: userKey,
     },
-    generateId: () => crypto.randomUUID(),
+    generateId: crypto.randomUUID,
 
     streamMode: "text",
     sendExtraMessageFields: true,
 
     async onResponse(response) {
-      console.log("RESP STREAM DATA: ", data);
       console.log(messages.at(-2));
 
       let recentPromptData: string | null | MessageData = response.headers.get(
@@ -76,9 +61,16 @@ export default function ChatPage() {
         console.error("error parsing latest prompt", err);
       }
     },
+    onError(err) {
+      console.error("Error responding to prompt", err);
+
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to respond to prompt",
+      });
+    },
     async onFinish(message) {
-      console.log("on finish STREAM DATA: ", data);
-      console.log("MESSAGES: ", messages);
       await Promise.all([
         Odin.addMessage(message),
         Odin.addMessage(messages.at(-2) || undefined),
@@ -88,9 +80,19 @@ export default function ChatPage() {
 
   useEffect(() => {
     setUserKey(localStorage.getItem("odin_user"));
+    messages.length;
     Odin.addMessage(initialMessages[0]);
-    Odin.getMessages().then(setMessages);
+    Odin.getMessages()
+      .then(setMessages)
+      .then((e) => {
+        console.log(e, messages.length);
+      });
   }, []);
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    setTimeout(() => scrollToEnd(containerRef), 100);
+  }, [messages]);
 
   return (
     <>
@@ -101,6 +103,7 @@ export default function ChatPage() {
           mb-4 border-[0px] border-red-300
         `}
         role="contentinfo"
+        ref={containerRef}
       >
         {messages.map((msg) => {
           return msg.role === "assistant" ? (
