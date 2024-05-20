@@ -19,9 +19,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "./ui/useToast";
+import { useState } from "react";
+import { Spinner } from "./icon/Spinner";
 
 export default function ContextInput() {
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const form = useForm<YoutubeUrlSchema>({
     resolver: zodResolver(youtubeUrlSchema),
     defaultValues: {
@@ -37,7 +40,11 @@ export default function ContextInput() {
         </legend>
 
         <form
-          onSubmit={form.handleSubmit((vals) => submitYtContext(vals, toast))}
+          onSubmit={form.handleSubmit(async (vals) => {
+            setIsLoading(true);
+            await submitYtContext(vals, toast);
+            setIsLoading(false);
+          })}
           className="space-y-6 mt-auto"
         >
           <FormField
@@ -50,6 +57,7 @@ export default function ContextInput() {
                 </FormLabel>
                 <FormControl>
                   <Input
+                    disabled={isLoading}
                     placeholder="https://youtube.com/watch?v=..."
                     {...field}
                   />
@@ -60,7 +68,19 @@ export default function ContextInput() {
           />
 
           <div className="ml-auto w-fit">
-            <Button type="submit">Add context</Button>
+            <Button
+              type="submit"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  Adding context
+                  <Spinner className="text-lg" />
+                </div>
+              ) : (
+                "Add context"
+              )}
+            </Button>
           </div>
         </form>
       </fieldset>
