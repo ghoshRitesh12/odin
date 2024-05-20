@@ -27,6 +27,7 @@ export default function ChatLayout({ children }: ChatLayoutProps) {
           flex-grow-1 flex flex-col overflow-auto
           md:flex-[55%] lg:flex-[65%] xl:flex-[78%]
           max-w-full w-full rounded-xl mt-2
+          px-1 pb-1
         `}
       >
         {children}

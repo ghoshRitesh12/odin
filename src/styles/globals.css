@@ -145,3 +145,16 @@ textarea {
     0.1s ease height, 0.1s ease gap, 0.1s ease max-width, 0.1s ease max-height,
     0.1s ease min-width, 0.1s ease min-height;
 }
+
+.prose p {
+  @apply [&:not(:last-child)]:mb-4 [&:not(:first-child)]:mt-4;
+}
+
+.prose ol,
+.prose ul {
+  list-style: decimal;
+}
+
+.prose li {
+  @apply ml-6 [&:not(:last-child)]:mb-3 last:mt-3 text-balance;
+}

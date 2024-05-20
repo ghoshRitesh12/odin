@@ -1,6 +1,6 @@
-import { HfInference } from "@huggingface/inference";
-import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import type { Document } from "langchain/document";
+import { getChatCompletionModel } from "./chatCompletionModel";
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 
 export async function getSummarizedChunks(transcript: string) {
   const textSplitter = new RecursiveCharacterTextSplitter({
@@ -18,12 +18,7 @@ export async function getSummarizedChunks(transcript: string) {
 
 async function invokeSummarizationChain(docs: Document<Record<string, any>>[]) {
   try {
-    // "meta-llama/Meta-Llama-3-8B-Instruct"
-    const chatCompletionModelName = "google/gemma-1.1-7b-it";
-    const hf = new HfInference(process.env.HUGGING_FACE_API_KEY!);
-
-    console.log(JSON.stringify(docs, null, 2));
-    console.log(docs.length);
+    const { hf, chatCompletionModelName } = getChatCompletionModel();
 
     const summaries = await Promise.all(
       docs.map(async (doc) => {

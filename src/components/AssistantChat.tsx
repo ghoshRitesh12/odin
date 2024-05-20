@@ -1,19 +1,18 @@
 import { cn } from "@/lib/utils";
+import type { PropsWithChildren } from "react";
 
-type AssistantChatProps = Readonly<{
-  message: string;
-}>;
+type AssistantChatProps = PropsWithChildren<{}>;
 
-export default function AssistantChat({ message }: AssistantChatProps) {
+export default function AssistantChat({ children }: AssistantChatProps) {
   return (
     <div
       className={cn`
-        w-fit px-4 py-2 rounded-2xl mr-auto leading-[1.4]
-        max-w-[30ch] sm:max-w-[40ch] bg-secondary
-        text-zinc-700 dark:text-zinc-200 my-2
+        w-fit px-4 py-2 rounded-2xl mr-auto leading-6
+        max-w-[36ch] sm:max-w-[70ch] bg-secondary
+        text-zinc-700 dark:text-zinc-200 my-4
       `}
     >
-      <div>{message}</div>
+      {children}
     </div>
   );
 }

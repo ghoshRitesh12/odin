@@ -1,16 +1,14 @@
 import Dexie, { type Table } from "dexie";
 import axios from "axios";
+import type { Message as MessageTable } from "ai";
+import type { ToastFn } from "@/components/ui/useToast";
+
+export type MessageData = Pick<MessageTable, "role" | "content">;
+export type MessageMetaData = Pick<MessageTable, "id" | "createdAt">;
 
 type UserTable = {
   id: string;
   userKey: string;
-};
-
-export type ConversationTable = {
-  id: string;
-  createdAt: Date;
-  userMessage: string;
-  assistantMessage: string;
 };
 
 export type ContextTable = {
@@ -27,6 +25,7 @@ class OdinDB extends Dexie {
 
   public user!: Table<UserTable, string>;
   public context!: Table<ContextTable, string>;
+  public messages!: Table<MessageTable, string>;
 
   private constructor() {
     super(OdinDB.dbname);
@@ -34,7 +33,7 @@ class OdinDB extends Dexie {
     this.version(1).stores({
       user: "id",
       context: "id",
-      conversation: "id, createdAt",
+      messages: "id",
     });
   }
 
@@ -46,18 +45,30 @@ class OdinDB extends Dexie {
   }
 
   public async initUser(userKey: string) {
-    if (await this.user.get(this.odinUserId)) return;
-    return this.user.add({ id: this.odinUserId, userKey }, this.odinUserId);
+    const userExists = await this.user.get(this.odinUserId);
+    if (userExists) {
+      return userExists.userKey;
+    }
+
+    return this.user
+      .add({ id: this.odinUserId, userKey }, this.odinUserId)
+      .then(() => userKey);
   }
 
-  public async addConversation(userKey: string) {
-    const odinUserId = "odin_user";
+  public async addMessage(message: MessageTable | undefined) {
+    if (message === undefined) {
+      return;
+    }
 
-    if (await this.user.get(odinUserId)) return;
-    return this.user.add({ id: odinUserId, userKey }, odinUserId);
+    const { id, ...otherInfo } = message;
+    return this.messages.add({ id, ...otherInfo }, message.id);
   }
 
-  public async addYtContext(videoId: string | undefined) {
+  public async getMessages() {
+    return this.messages.toArray();
+  }
+
+  public async addYtContext(videoId: string | undefined, toast: ToastFn) {
     try {
       if (!videoId) {
         throw new Error("Invalid youtube video");
@@ -72,6 +83,11 @@ class OdinDB extends Dexie {
         throw new Error("Video context already exists, try another video");
       }
 
+      toast({
+        title: "Adding new video context...",
+        description: "Hang tight while we get things ready.",
+      });
+
       await axios
         .post(
           `/api/video/new`,
@@ -84,6 +100,11 @@ class OdinDB extends Dexie {
         )
         .catch(() => {
           throw new Error("Failed to fetch video transcript, try again later");
+        })
+        .then(() => {
+          toast({
+            title: "New video context added",
+          });
         });
 
       return this.context.add({
@@ -96,7 +117,7 @@ class OdinDB extends Dexie {
     }
   }
 
-  private async getUserKey() {
+  public async getUserKey() {
     try {
       const user = await this.user.get(this.odinUserId);
       if (!user) {

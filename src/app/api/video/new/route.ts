@@ -1,10 +1,6 @@
 import { upsertTranscriptChunks } from "@/lib/pinecone";
-import { getEmbeddings } from "@/lib/googleai";
-// import { ConversationChain } from "langchain/chains";
 import { generateTranscript } from "@/lib/transcript";
 import { getSummarizedChunks } from "@/lib/summarize";
-
-// getEmbeddings("s")
 
 export async function POST(req: Request) {
   const { videoId, userId } = await req.json().catch(() => {
@@ -52,17 +48,7 @@ export async function POST(req: Request) {
     console.log(`Upserted embedded chunks into pinecone index`);
 
     return Response.json(
-      {
-        status: 400,
-        message: "Seems like nothing wrong happened",
-      },
-      { status: 400 }
-    );
-
-    return Response.json(
-      {
-        transcript,
-      },
+      {},
       {
         status: 200,
       }

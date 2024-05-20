@@ -1,17 +1,15 @@
-import { Pinecone } from "@pinecone-database/pinecone";
+import { getEmbeddingModel } from "./embedding";
 import { PineconeStore } from "@langchain/pinecone";
-import { HuggingFaceInferenceEmbeddings } from "@langchain/community/embeddings/hf";
+import { Pinecone } from "@pinecone-database/pinecone";
 
 const apiKey = process.env.PINECONE_API_KEY;
 const pineconeIndexName = process.env.PINECONE_INDEX_NAME;
-// const chunkIdSeparator = "@";
 
 if (!apiKey || !pineconeIndexName) {
   throw new Error("Missing PINECONE_API_KEY environment variable");
 }
 
 export const pinecone = new Pinecone({ apiKey });
-
 export const videosIndex = pinecone.Index(pineconeIndexName);
 
 export async function upsertTranscriptChunks(
@@ -20,10 +18,7 @@ export async function upsertTranscriptChunks(
   userId: string
 ) {
   try {
-    const embeddings = new HuggingFaceInferenceEmbeddings({
-      apiKey: process.env.HUGGING_FACE_API_KEY!,
-      model: "jinaai/jina-embeddings-v2-base-en",
-    });
+    const embeddings = getEmbeddingModel();
 
     await PineconeStore.fromTexts(
       texts,
@@ -42,10 +37,7 @@ export async function upsertTranscriptChunks(
 
 export async function getVectorStore(userId: string) {
   try {
-    const embeddings = new HuggingFaceInferenceEmbeddings({
-      apiKey: process.env.HUGGING_FACE_API_KEY!,
-      model: "jinaai/jina-embeddings-v2-base-en",
-    });
+    const embeddings = getEmbeddingModel();
 
     const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
       pineconeIndex: videosIndex,

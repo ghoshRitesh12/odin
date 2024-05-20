@@ -1,35 +1,8 @@
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { HarmBlockThreshold, HarmCategory } from "@google/generative-ai";
+import { ChatCloudflareWorkersAI } from "@langchain/cloudflare";
 
-export const streamingModel = new ChatGoogleGenerativeAI({
-  model: "gemini-pro",
-  maxOutputTokens: 2048,
-  safetySettings: [
-    {
-      category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-      threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
-    },
-  ],
-  temperature: 0,
+export const model = new ChatCloudflareWorkersAI({
+  model: "@cf/meta/llama-2-7b-chat-int8",
+  cloudflareAccountId: process.env.CLOUDFLARE_ACCOUNT_ID,
+  cloudflareApiToken: process.env.CLOUDFLARE_API_TOKEN,
   streaming: true,
 });
-
-export const nonStreamingModel = new ChatGoogleGenerativeAI({
-  model: "gemini-pro",
-  maxOutputTokens: 2048,
-  safetySettings: [
-    {
-      category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-      threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
-    },
-  ],
-  temperature: 0,
-});
-
-// Batch and stream are also supported
-// const res = await model.invoke([
-//   [
-//     "human",
-//     "What would be a good company name for a company that makes colorful socks?",
-//   ],
-// ]);

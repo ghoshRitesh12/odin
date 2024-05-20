@@ -26,7 +26,7 @@ export async function submitYtContext(
     new URLSearchParams(new URL(values.url).search).get("v") || undefined;
 
   try {
-    await Odin.addYtContext(videoId);
+    await Odin.addYtContext(videoId, toast);
 
     toast({
       title: "Success",
@@ -41,9 +41,7 @@ export async function submitYtContext(
 
     toast({
       title: "Error adding context",
-      description: err?.message || "Failed to add youtube video context",
+      description: err?.message || "Failed to add video context",
     });
   }
 }
-
-// https://www.youtube.com/watch?v=HCOQmKTFzYY

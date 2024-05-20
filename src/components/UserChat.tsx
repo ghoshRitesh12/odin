@@ -9,8 +9,8 @@ export default function UserChat({ message }: UserChatProps) {
     <div
       className={cn`
         w-fit bg-primary text-zinc-200 px-3 py-2
-        rounded-2xl ml-auto leading-[1.4] my-2
-        max-w-[30ch] sm:max-w-[40ch]
+        rounded-2xl ml-auto leading-6 my-4
+        max-w-[36ch] sm:max-w-[70ch]
       `}
     >
       <div>{message}</div>

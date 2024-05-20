@@ -1,7 +1,10 @@
-import { cn } from "@/lib/utils";
-import AssistantChat from "./AssistantChat";
-import UserChat from "./UserChat";
+"use client";
+
 import type { Key } from "react";
+import { cn } from "@/lib/utils";
+
+import UserChat from "./UserChat";
+import AssistantChat from "./AssistantChat";
 
 type Convo = {
   role: "assistant" | "user";
@@ -124,11 +127,9 @@ export default function ChatView({ className }: ChatViewProps) {
       `}
       role="contentinfo"
     >
-      {/* <div className="flex flex-col pr-3 overflow-y-auto"> */}
       {convos.map((convo, index) => {
         return convoMap[convo.role](index, convo.message);
       })}
-      {/* </div> */}
     </div>
   );
 }

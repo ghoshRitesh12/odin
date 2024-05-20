@@ -9,15 +9,19 @@ export default function UserIdSetter() {
 
   useEffect(() => {
     if (crypto?.randomUUID) {
-      Odin.initUser(crypto.randomUUID()).catch((e) => {
-        console.error(e); // TODO: remove this line
+      Odin.initUser(crypto.randomUUID())
+        .catch((e) => {
+          console.error(e); // TODO: remove this line
 
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to setup user identification",
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to setup user identification",
+          });
+        })
+        .then((userKey) => {
+          if (userKey) localStorage.setItem("odin_user", userKey);
         });
-      });
     }
   }, []);
 

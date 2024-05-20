@@ -1,46 +1,43 @@
+import { model } from "./llm";
 import { getVectorStore } from "./pinecone";
-import {
-  ChatPromptTemplate,
-  MessagesPlaceholder,
-} from "@langchain/core/prompts";
+import type { Runnable } from "@langchain/core/runnables";
+import type { BaseMessage } from "@langchain/core/messages";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { createRetrievalChain } from "langchain/chains/retrieval";
+import { STANDALONE_QUESTION_TEMPLATE, QA_TEMPLATE } from "./promptTemplates";
 import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
 import { createHistoryAwareRetriever } from "langchain/chains/history_aware_retriever";
 
-import { streamingModel, nonStreamingModel } from "./llm";
-import {
-  StreamingTextResponse,
-  StreamData,
-  LangChainAdapter,
-  LangChainStream,
-} from "ai";
-import { STANDALONE_QUESTION_TEMPLATE, QA_TEMPLATE } from "./promptTemplates";
-
-type callChainArgs = {
-  question: string;
-  chatHistory: string;
-  userId: string;
-};
-
-export async function callChain({
-  question,
-  chatHistory,
-  userId,
-}: callChainArgs) {
+export async function createRAGChain(
+  userId: string
+): Promise<Runnable<{ input: string; chat_history: BaseMessage[] }, string>> {
   try {
-    const sanitizedQuestion = question.replace(/[\s]/g, " ");
     const vectorStore = await getVectorStore(userId);
 
-    const streams = await streamingModel.stream("");
-    const {} = LangChainAdapter.toAIStream(streams);
+    const historyAwarePrompt = ChatPromptTemplate.fromMessages(
+      STANDALONE_QUESTION_TEMPLATE
+    );
 
-    const retrieverChain = createHistoryAwareRetriever({
-      // @ts-ignore
-      llm: nonStreamingModel,
+    const historyAwareRetriever = await createHistoryAwareRetriever({
+      llm: model,
       retriever: vectorStore.asRetriever(),
-      rephrasePrompt: "",
+      rephrasePrompt: historyAwarePrompt,
     });
 
-    //
-  } catch (err) {}
+    const promptGetAnswer = ChatPromptTemplate.fromMessages(QA_TEMPLATE);
+
+    const questionAnswerChain = await createStuffDocumentsChain({
+      llm: model,
+      prompt: promptGetAnswer,
+    });
+
+    const conversationalRetrievalChain = await createRetrievalChain({
+      retriever: historyAwareRetriever,
+      combineDocsChain: questionAnswerChain,
+    });
+
+    return conversationalRetrievalChain.pick("answer");
+  } catch (err) {
+    throw err;
+  }
 }
