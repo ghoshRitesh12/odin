@@ -10,9 +10,7 @@ export default function UserIdSetter() {
   useEffect(() => {
     if (crypto?.randomUUID) {
       Odin.initUser(crypto.randomUUID())
-        .catch((e) => {
-          console.error(e); // TODO: remove this line
-
+        .catch(() => {
           toast({
             variant: "destructive",
             title: "Error",
