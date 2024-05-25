@@ -22,6 +22,7 @@ export function scrollToEnd(containerRef: React.RefObject<HTMLElement>) {
       lastMessage.scrollIntoView({
         behavior: "smooth",
         block: "end",
+        inline: "end",
       });
     }
   }
