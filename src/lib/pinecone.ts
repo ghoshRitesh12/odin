@@ -6,7 +6,9 @@ const apiKey = process.env.PINECONE_API_KEY;
 const pineconeIndexName = process.env.PINECONE_INDEX_NAME;
 
 if (!apiKey || !pineconeIndexName) {
-  throw new Error("Missing PINECONE_API_KEY environment variable");
+  throw new Error(
+    "Missing PINECONE_API_KEY or index name environment variable"
+  );
 }
 
 export const pinecone = new Pinecone({ apiKey });
