@@ -1,7 +1,6 @@
 import { createRAGChain } from "@/lib/langchain";
 import { StreamingTextResponse, type Message as VercelChatMessage } from "ai";
 import { AIMessage, ChatMessage, HumanMessage } from "@langchain/core/messages";
-import { cookies, headers } from "next/headers";
 
 export const revalidate = true;
 export const dynamic = "force-dynamic";
@@ -42,8 +41,6 @@ export async function POST(req: Request) {
     });
 
     const byteStream = stream.pipeThrough(new TextEncoderStream());
-
-    console.log("ID: ", currentMessage.id);
 
     return new StreamingTextResponse(byteStream, {
       headers: {
