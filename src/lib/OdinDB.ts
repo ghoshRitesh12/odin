@@ -3,16 +3,13 @@ import axios from "axios";
 import type { Message as MessageTable } from "ai";
 import type { ToastFn } from "@/components/ui/useToast";
 
-export type MessageData = Pick<MessageTable, "role" | "content">;
-export type MessageMetaData = Pick<MessageTable, "id" | "createdAt">;
-
 type UserTable = {
   id: string;
   userKey: string;
 };
 
 export type ContextTable = {
-  id: string;
+  id: number;
   videoId: string;
   createdAt: number;
 };
@@ -56,12 +53,17 @@ class OdinDB extends Dexie {
   }
 
   public async addMessage(message: MessageTable | undefined) {
-    if (message === undefined) {
-      return;
+    const defaultMsgKey = "0";
+
+    if (
+      !message ||
+      (message?.id === defaultMsgKey && (await this.messages.get(message.id)))
+    ) {
+      return false;
     }
 
     const { id, ...otherInfo } = message;
-    return this.messages.add({ id, ...otherInfo }, message.id);
+    return this.messages.add({ id, ...otherInfo }, message.id).then(() => true);
   }
 
   public async getMessages() {
@@ -108,7 +110,7 @@ class OdinDB extends Dexie {
         });
 
       return this.context.add({
-        id: videoId,
+        id: Date.now(),
         videoId,
         createdAt: Date.now(),
       });
