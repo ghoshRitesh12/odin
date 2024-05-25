@@ -3,7 +3,7 @@ import { YoutubeIcon } from "./icon/YoutubeIcon";
 import Link from "next/link";
 
 type ContextCardProps = Readonly<{
-  id: number;
+  id: string;
   name: string;
 }>;
 
