@@ -7,10 +7,12 @@ import { Spinner } from "@/components/icon/Spinner";
 import { SendIcon } from "@/components/icon/SendIcon";
 import { Button } from "@/components/ui/button";
 import { cn, initialMessages, scrollToEnd } from "@/lib/utils";
+import type { Message } from "ai";
+import { ulid } from "ulid";
 import { useChat } from "ai/react";
 import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Odin, type MessageData, type MessageMetaData } from "@/lib/OdinDB";
+import { Odin } from "@/lib/OdinDB";
 import { useToast } from "@/components/ui/useToast";
 
 export default function ChatPage() {
@@ -30,35 +32,39 @@ export default function ChatPage() {
     body: {
       userId: userKey,
     },
-    generateId: crypto.randomUUID,
+    generateId: () => ulid(Date.now()),
 
     streamMode: "text",
     sendExtraMessageFields: true,
 
     async onResponse(response) {
-      console.log(messages.at(-2));
+      console.log("ON RESPONSE: ", messages);
 
-      let recentPromptData: string | null | MessageData = response.headers.get(
-        "x-recent-prompt-data"
-      );
+      let recentMsg: Message = {
+        id: response.headers.get("x-recent-prompt-id") || "",
+        content: response.headers.get("x-recent-prompt-content") || "",
+        role: response.headers.get("x-recent-prompt-role") as Message["role"],
+        createdAt:
+          new Date(response.headers.get("x-recent-prompt-created-at") || "") ||
+          undefined,
+      };
 
-      let recentPromptMetaData: string | null | MessageMetaData =
-        response.headers.get("x-recent-prompt-meta-data");
+      console.log(recentMsg);
 
-      try {
-        recentPromptData = JSON.parse(recentPromptData || "") as MessageData;
-        recentPromptMetaData = JSON.parse(
-          recentPromptMetaData || ""
-        ) as MessageMetaData;
-
-        if (recentPromptData && recentPromptMetaData) {
-          await Odin.addMessage({
-            ...recentPromptData,
-            ...recentPromptMetaData,
+      if (
+        recentMsg?.content &&
+        recentMsg?.role &&
+        recentMsg?.content &&
+        recentMsg?.createdAt
+      ) {
+        await Odin.addMessage(recentMsg).catch((err) => {
+          console.log("ON RESPONSE err: ", err);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to persist chat history",
           });
-        }
-      } catch (err) {
-        console.error("error parsing latest prompt", err);
+        });
       }
     },
     onError(err) {
@@ -71,22 +77,28 @@ export default function ChatPage() {
       });
     },
     async onFinish(message) {
-      await Promise.all([
-        Odin.addMessage(message),
-        Odin.addMessage(messages.at(-2) || undefined),
-      ]);
+      try {
+        console.log("FINISH: ", message);
+        await Odin.addMessage(message);
+      } catch (err) {
+        console.log("FINISH err: ", err);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to persist chat history",
+        });
+      }
     },
   });
 
   useEffect(() => {
     setUserKey(localStorage.getItem("odin_user"));
-    messages.length;
-    Odin.addMessage(initialMessages[0]);
-    Odin.getMessages()
-      .then(setMessages)
-      .then((e) => {
-        console.log(e, messages.length);
-      });
+
+    Odin.addMessage(initialMessages[0]).then(async (isAdded) => {
+      if (!isAdded) {
+        await Odin.getMessages().then(setMessages);
+      }
+    });
   }, []);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -121,7 +133,7 @@ export default function ChatPage() {
 
       <div>
         <form
-          onSubmit={(e) => handleSubmit(e, {})}
+          onSubmit={handleSubmit}
           className={cn`
             flex overflow-hidden rounded-lg border 
             bg-background focus-within:ring-1 focus-within:ring-ring 
@@ -139,7 +151,7 @@ export default function ChatPage() {
             value={input}
             disabled={isLoading}
             onChange={handleInputChange}
-            placeholder="Type your message here..."
+            placeholder={"Type your message here..."}
             className="min-h-12 resize-none border-0 p-3 shadow-none focus-visible:ring-0"
           />
 
