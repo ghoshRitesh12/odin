@@ -22,6 +22,9 @@ export async function createRAGChain(
       llm: model,
       retriever: vectorStore.asRetriever(),
       rephrasePrompt: historyAwarePrompt,
+      // retriever: vectorStore.asRetriever({
+      //   metadata: { userId },
+      // }),
     });
 
     const promptGetAnswer = ChatPromptTemplate.fromMessages(QA_TEMPLATE);
