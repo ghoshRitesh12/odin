@@ -9,7 +9,7 @@ type UserTable = {
 };
 
 export type ContextTable = {
-  id: number;
+  id: string;
   videoId: string;
   createdAt: number;
 };
@@ -110,7 +110,7 @@ class OdinDB extends Dexie {
         });
 
       return this.context.add({
-        id: Date.now(),
+        id: videoId,
         videoId,
         createdAt: Date.now(),
       });
