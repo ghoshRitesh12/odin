@@ -111,7 +111,7 @@ export default function ChatPage() {
       <div
         className={cn`
           overflow-y-auto flex-1 pb-2 md:pl-2 pr-3 
-          max-h-[32.5rem] min-h-[32.5rem] md:max-h-[45.5rem]
+          max-h-[43rem] min-h-[32.5rem] md:max-h-[45.5rem]
           mb-4 border-[0px] border-red-300
         `}
         role="contentinfo"
