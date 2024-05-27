@@ -20,11 +20,12 @@ export async function createRAGChain(
 
     const historyAwareRetriever = await createHistoryAwareRetriever({
       llm: model,
-      retriever: vectorStore.asRetriever(),
       rephrasePrompt: historyAwarePrompt,
-      // retriever: vectorStore.asRetriever({
-      //   metadata: { userId },
-      // }),
+      retriever: vectorStore.asRetriever({
+        filter: {
+          userId,
+        },
+      }),
     });
 
     const promptGetAnswer = ChatPromptTemplate.fromMessages(QA_TEMPLATE);
